@@ -161,7 +161,6 @@ class Graph:
                     # enqueue the path
                     q.enqueue(v_copy)
 
-
     def dfs(self, starting_vertex, target_vertex):
         """
         Return a list containing a path from
@@ -198,7 +197,7 @@ class Graph:
                     v_copy.append(neighbor)
                     # enqueue the path
                     s.push(v_copy)
-    
+
     def dfs_recursive(self, starting_vertex, target_vertex):
         """
         Return a list containing a path from
@@ -219,7 +218,7 @@ class Graph:
             # While queue is not empty:
             if stack.size() < 1:
                 return
-            
+
             else:
                 v = stack.pop()
 
@@ -241,7 +240,7 @@ class Graph:
                         # enqueue the path
                         stack.push(v_copy)
                 return internal_dfs(stack)
-        
+
         return internal_dfs(s)
 
     # During lecture coding, with a default parameter
@@ -259,7 +258,8 @@ class Graph:
     #         if neighbor not in visited:
     #             self.dft_recursive(neighbor, visited)
 
-    # def dfs_recursive(self, starting_vert, ending_vert, visited=None, path=None):
+    # def dfs_recursive(self, starting_vert, ending_vert, visited=None, 
+    # path=None):
     #     if visited is None:
     #         visited = set()
     #     if path is None:
@@ -282,7 +282,7 @@ class Graph:
     #             # only return if new path received
     #             if new_path is not None:
     #                 return new_path
-        
+
     #     return None
 
 
