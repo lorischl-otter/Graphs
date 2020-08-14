@@ -4,6 +4,9 @@ from world import World
 
 import random
 from ast import literal_eval
+# import timeit
+
+# start = timeit.default_timer()
 
 # Load world
 world = World()
@@ -33,6 +36,9 @@ traversal_path = []
 Project code begins here.
 """
 
+# Create dictionary of "opposite" directions
+opposites = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
+
 
 def room_traversal():
     """
@@ -44,8 +50,12 @@ def room_traversal():
     '?' used in created dictionary to indicate unexplored directions
     in a given room.
     """
-    # Create dictionary of "opposite" directions
-    opposites = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
+
+    # Clear traversal path
+    traversal_path.clear()
+
+    # Ensure player is in correct starting place
+    player.current_room = world.starting_room
 
     # Initiate empty dict to store visited rooms
     visited = {}
@@ -61,13 +71,28 @@ def room_traversal():
     while len(visited) < 500:
         # Travel in random directions until a room is reached with no
         # unexplored paths left
-        while any(v == '?' for k, v in visited[player.current_room.id].items()):
+        while any(
+                v == '?' for k, v in visited[player.current_room.id].items()):
             # Set room variable for code readability
             room = player.current_room
 
             # Select a random available direction from current room
             directions = [k for k, v in visited[room.id].items() if v == '?']
-            d = random.choice(directions)
+
+            # Check to see if any potential direction is a dead end
+            dead_end = False
+            for d in directions:
+                r = room.get_room_in_direction(d)
+                if len(r.get_exits()) == 1:
+                    dead_end_dir = str(d)
+                    dead_end = True
+
+            # If so, move there first
+            if dead_end:
+                d = str(dead_end_dir)
+            # Otherwise, pick a random direction
+            else:
+                d = random.choice(directions)
 
             # Add direction to traversal_path
             traversal_path.append(d)
@@ -83,7 +108,8 @@ def room_traversal():
 
             if new_room.id not in visited:
                 # Create dict with question marks for potential rooms
-                visited[new_room.id] = {exit: '?' for exit in new_room.get_exits()}
+                visited[new_room.id] = {
+                    exit: '?' for exit in new_room.get_exits()}
 
             # Update new room with a reference to previous room
             visited[new_room.id][opposites[d]] = room.id
@@ -143,8 +169,17 @@ def search(visited_rooms, starting_room):
                 queue.append(path_copy)
 
 
-# Call function
-room_traversal()
+# Call function multiple times to find the lowest # of moves
+best_traversal_path = []
+
+for i in range(1500):
+    room_traversal()
+    if i == 0:
+        best_traversal_path = list(traversal_path)
+    elif len(traversal_path) < len(best_traversal_path):
+        best_traversal_path = list(traversal_path)
+
+traversal_path = list(best_traversal_path)
 
 
 # TRAVERSAL TEST
@@ -156,14 +191,15 @@ for move in traversal_path:
     player.travel(move)
     visited_rooms.add(player.current_room)
 
-print(traversal_path)
-
 if len(visited_rooms) == len(room_graph):
     print(f"TESTS PASSED: {len(traversal_path)} moves, \
         {len(visited_rooms)} rooms visited")
 else:
     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
     print(f"{len(room_graph) - len(visited_rooms)} unvisited rooms")
+
+# stop = timeit.default_timer()
+# print('Time: ', stop - start)
 
 
 #######
